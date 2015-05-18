@@ -1,0 +1,24 @@
+---
+title: "CourseProject PML"
+author: "Sasha"
+date: "Sunday, May 17, 2015"
+output: html_document
+---
+
+The value of this project for me was not so much machine learning itself (I have had a lot of it and hopefully will have a lot more in a real life), but rather learning R support for ML. So I did not spend as much time as it could be appropriate on the real data analysis, but followed lectures and forums on R usage. I was very impressed with the R richness and brevity.
+
+There was a lots of data (19622 observations), nicely distributed by the classes (A:5580, B:3797, C:3422, D:3216, E:3607). The variables were also numerous (160), but only 60 of them had significant non-NA data: colMeans(is.na(data)) < 0.95 returns only 60 variables. There is absolutely no sense to interpolate absent values (you just cannot impute the rest out of 2-3%), though the present values could in theory be used in decision trees/forests. The question whether it is worth could be defined only by the success of the simpler analysis, ignoring all of mostly-empty columns  (data<-dataRead[,colMeans(is.na(dataRead)) < 0.95]). I started with a simplified set and it happened to be good enough, so I never returned to the dropped NA-rich variables.
+
+The first thing after cleaning garbage was to plan the experiment. Since there was plenty of data, I decided to divide available 19622 observations into 3 classes: training (~70%), testing (~28%) and prevalidation (~2%: 493 obs.). I did not really happen to need prevalidation, but it is always good to set aside some unseen material in case some additional checks will be needed. 
+
+Next question was the algorithm choice. Since it is multi-factor classification, only certain methods could be considered (e.g. trees/forests, SVM, LDA, KNN). Trees seemed most appropriate, so I started from a simplest RPART (decision tree). Training was very quick, but the accuracy came oit very low (~52%). Next I tried RF (random forest), but it was training for so long that I dropped it. Next practical choice (quicker than RF, but quite competetive) was GBM. I got the wind of it from the forum, never heard it before (though from reading Friedman's 2001-2002 papers now it looks like I did some very similar homemade tricks long time ago, around 1985, so I naturally liked it...). And it worked great! The training completed in about an hour, and the accuracy was at least 95%: 0.9957 on the training set / 0.951 on the test set / 0.9817 on prevalidation set. 
+
+From looking at the test and prevalidation sets, I can assume that the anticipated accuracy on a new datasets will be between 94%-97%.
+Probably it is quite possible to improve the accuracy further by (a) tuning parameters; (b)adding back some of the dropped variables, (c) trying other algorithms, like RF. But it does not have much sense.  Improvements beyond 95% are usually not really meaningful outside of academy, since there are too many influential factors of variability outside of the experiment definition - the improvement will be a nice  sport to have, but probably nothing important for the real life.
+
+
+The results of the "official" validation set submission quite fitted this, there were 19 correct out of 20.  The code is checked in.
+
+And I want to thank JHU and Coursera stuff for the excellent course!   
+
+
